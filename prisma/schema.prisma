@@ -1,0 +1,100 @@
+// MediConnect - Healthcare Platform
+// Prisma schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PATIENT
+  DOCTOR
+  ADMIN
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  image     String?
+  blocked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patientAppointments Appointment[]  @relation("Patient")
+  doctorProfile       DoctorProfile?
+  writtenReviews      Review[]       @relation("PatientReviews")
+}
+
+model DoctorProfile {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio            String?
+  specialization String
+  experience     Int      // years
+  fee            Float
+  approved       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  appointments  Appointment[]
+  availability  Availability[]
+  reviews       Review[]
+}
+
+model Availability {
+  id        String   @id @default(cuid())
+  doctorId  String
+  doctor    DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  dayOfWeek Int      // 0 = Sunday, 1 = Monday, ... 6 = Saturday
+  startTime String   // "09:00"
+  endTime   String   // "17:00"
+  createdAt DateTime @default(now())
+
+  @@unique([doctorId, dayOfWeek, startTime])
+}
+
+model Appointment {
+  id        String            @id @default(cuid())
+  doctorId  String
+  patientId String
+  date      String            // YYYY-MM-DD
+  time      String            // "14:30"
+  status    AppointmentStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  doctor  DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  patient User          @relation("Patient", fields: [patientId], references: [id], onDelete: Cascade)
+  review  Review?
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  doctorId  String
+  patientId String
+  appointmentId String? @unique
+  rating    Int      // 1-5
+  comment   String?
+  createdAt DateTime @default(now())
+
+  doctor      DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  patient     User          @relation("PatientReviews", fields: [patientId], references: [id], onDelete: Cascade)
+  appointment Appointment?  @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+
+  @@unique([doctorId, patientId, appointmentId])
+}
