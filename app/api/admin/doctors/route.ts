@@ -34,3 +34,29 @@ export async function PATCH(req: NextRequest) {
   });
   return NextResponse.json(updated);
 }
+
+export async function DELETE(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const role = (session.user as { role?: string }).role;
+  if (role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+  const { searchParams } = new URL(req.url);
+  const doctorId = searchParams.get('id');
+
+  if (!doctorId) return NextResponse.json({ error: 'doctorId required' }, { status: 400 });
+
+  const profile = await prisma.doctorProfile.findUnique({
+    where: { id: doctorId },
+    select: { userId: true },
+  });
+
+  if (!profile) return NextResponse.json({ error: 'Doctor not found' }, { status: 404 });
+
+  // Deleting the user will cascade to the doctor profile based on our schema
+  await prisma.user.delete({
+    where: { id: profile.userId },
+  });
+
+  return NextResponse.json({ success: true });
+}

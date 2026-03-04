@@ -7,7 +7,7 @@ const registerSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(6),
-  role: z.enum(['PATIENT', 'DOCTOR']),
+  role: z.enum(['PATIENT', 'DOCTOR', 'ADMIN']),
 });
 
 export async function POST(req: Request) {
@@ -21,6 +21,19 @@ export async function POST(req: Request) {
       );
     }
     const { name, email, password, role } = parsed.data;
+
+    // Singularity check: Only allow one admin
+    if (role === 'ADMIN') {
+      const adminExists = await prisma.user.findFirst({
+        where: { role: 'ADMIN' },
+      });
+      if (adminExists) {
+        return NextResponse.json(
+          { error: { role: ['An administrator already exists'] } },
+          { status: 400 }
+        );
+      }
+    }
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
