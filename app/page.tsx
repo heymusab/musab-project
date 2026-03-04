@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { motion, useMotionValue, useSpring, useTransform, Variants } from 'framer-motion';
 
@@ -10,12 +10,12 @@ function TiltCard({ children, className }: { children: React.ReactNode, classNam
     const y = useMotionValue(0);
 
     // Smooth out the spring setting
-    const mouseXSpring = useSpring(x, { stiffness: 300, damping: 20 });
-    const mouseYSpring = useSpring(y, { stiffness: 300, damping: 20 });
+    const mouseXSpring = useSpring(x, { stiffness: 120, damping: 20, mass: 0.1 });
+    const mouseYSpring = useSpring(y, { stiffness: 120, damping: 20, mass: 0.1 });
 
-    // Transform coordinates into degrees
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
+    // Transform coordinates into degrees (subtle tilt)
+    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7deg", "-7deg"]);
+    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7deg", "7deg"]);
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         const rect = e.currentTarget.getBoundingClientRect();
@@ -38,7 +38,7 @@ function TiltCard({ children, className }: { children: React.ReactNode, classNam
         <motion.div
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
-            style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+            style={{ rotateX, rotateY, transformStyle: "preserve-3d", willChange: "transform" }}
             className={`relative perspective-1000 ${className}`}
         >
             {children}
@@ -54,18 +54,10 @@ const fadeInUp: Variants = {
 
 const staggerContainer: Variants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
+    visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.1 } }
 };
 
 export default function Page() {
-    const [activeFeature, setActiveFeature] = useState(0);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setActiveFeature((prev) => (prev + 1) % 3);
-        }, 3000);
-        return () => clearInterval(interval);
-    }, []);
 
     const features = [
         {
@@ -171,9 +163,9 @@ export default function Page() {
 
                         {/* 3D Hero Image/Dashboard Preview */}
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 1, delay: 0.2 }}
+                            initial={{ opacity: 0, y: 40 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
                             className="relative z-10 w-full flex justify-center lg:justify-end"
                         >
                             <TiltCard className="w-full max-w-lg">
@@ -249,9 +241,7 @@ export default function Page() {
                             >
                                 <TiltCard>
                                     <div
-                                        className={`p-8 bg-black/40 backdrop-blur-xl rounded-3xl border transition-colors duration-500 h-full flex flex-col items-start translate-z-10 preserve-3d shadow-2xl
-                                        ${activeFeature === index ? 'border-cyan-500/50 bg-white/10' : 'border-white/10 hover:border-white/20'}
-                                        `}
+                                        className="p-8 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 hover:border-cyan-500/50 hover:bg-white/10 transition-all duration-300 h-full flex flex-col items-start translate-z-10 preserve-3d shadow-2xl"
                                     >
                                         <div className="text-5xl mb-6 translate-z-30 drop-shadow-lg">{feature.icon}</div>
                                         <h3 className="text-2xl font-bold text-white mb-3 translate-z-20">{feature.title}</h3>
@@ -269,10 +259,10 @@ export default function Page() {
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/80 pointer-events-none" />
 
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
                     className="max-w-4xl mx-auto text-center px-6 lg:px-8 relative z-10"
                 >
                     <div className="inline-block p-1 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 mb-8">

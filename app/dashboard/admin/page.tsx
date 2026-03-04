@@ -43,9 +43,9 @@ export default function AdminDashboardPage() {
         {statCards.map((card, i) => (
           <motion.div
             key={card.title}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.1 }}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1, ease: "easeOut" }}
             className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 shadow-xl relative overflow-hidden group"
           >
             <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${card.color} opacity-5 blur-2xl -mr-12 -mt-12 group-hover:opacity-10 transition-opacity`}></div>

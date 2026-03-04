@@ -116,9 +116,9 @@ export default function AdminDoctorsPage() {
               <motion.div
                 key={d.id}
                 layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
                 className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 shadow-xl relative overflow-hidden group hover:border-cyan-500/30 transition-all duration-300"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none group-hover:bg-cyan-500/10 transition-colors"></div>
@@ -152,8 +152,8 @@ export default function AdminDoctorsPage() {
                     <button
                       onClick={() => setApproved(d.id, !d.approved)}
                       className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${d.approved
-                          ? 'bg-white/5 text-gray-400 hover:bg-white/10'
-                          : 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:bg-green-400'
+                        ? 'bg-white/5 text-gray-400 hover:bg-white/10'
+                        : 'bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:bg-green-400'
                         }`}
                     >
                       {d.approved ? (
