@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 type Appointment = {
   id: string;
@@ -31,49 +32,81 @@ export default function DoctorAppointmentsPage() {
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Appointment Management</h1>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <h1 className="text-3xl font-bold text-white mb-8 tracking-tight">Appointment Management</h1>
       {loading ? (
-        <p className="text-gray-500">Loading...</p>
+        <div className="flex items-center gap-3">
+          <div className="w-5 h-5 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin"></div>
+          <p className="text-cyan-400 font-medium">Loading appointments...</p>
+        </div>
       ) : (
-        <ul className="space-y-3">
-          {list.map((a) => (
-            <li key={a.id} className="flex items-center justify-between bg-white border rounded-lg p-4">
-              <div>
-                <p className="font-medium">{a.patient.name}</p>
-                <p className="text-sm text-gray-500">{a.date} at {a.time} — {a.status}</p>
-              </div>
-              <div className="flex gap-2">
-                {a.status === 'PENDING' && (
-                  <>
-                    <button
-                      onClick={() => updateStatus(a.id, 'CONFIRMED')}
-                      className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
-                    >
-                      Accept
-                    </button>
-                    <button
-                      onClick={() => updateStatus(a.id, 'CANCELLED')}
-                      className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
-                    >
-                      Reject
-                    </button>
-                  </>
-                )}
-                {a.status === 'CONFIRMED' && (
-                  <button
-                    onClick={() => updateStatus(a.id, 'COMPLETED')}
-                    className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-                  >
-                    Mark completed
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="space-y-4">
+          {list.length === 0 ? (
+            <div className="bg-black/20 rounded-2xl border border-white/5 p-8 text-center">
+              <p className="text-gray-400">No appointments found.</p>
+            </div>
+          ) : (
+            <ul className="space-y-4">
+              {list.map((a) => (
+                <motion.li
+                  key={a.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-center justify-between bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/5 transition-all duration-300 group shadow-lg"
+                >
+                  <div>
+                    <p className="font-bold text-white text-lg mb-1 group-hover:text-cyan-400 transition-colors">
+                      {a.patient.name}
+                    </p>
+                    <p className="text-sm text-gray-400 mb-3">{a.patient.email}</p>
+                    <p className="text-sm text-gray-400 flex items-center gap-4">
+                      <span className="flex items-center gap-1.5">📅 {a.date}</span>
+                      <span className="flex items-center gap-1.5">⏰ {a.time}</span>
+                      <span className={`px-2 py-0.5 rounded-md text-xs border ${a.status === 'PENDING' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
+                          a.status === 'CONFIRMED' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
+                            a.status === 'COMPLETED' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                              'bg-red-500/10 text-red-400 border-red-500/20'
+                        }`}>
+                        {a.status}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    {a.status === 'PENDING' && (
+                      <>
+                        <button
+                          onClick={() => updateStatus(a.id, 'CONFIRMED')}
+                          className="px-4 py-2 bg-cyan-500/10 text-cyan-400 rounded-xl text-sm font-semibold border border-cyan-500/20 hover:bg-cyan-500 hover:text-white transition-all duration-300"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => updateStatus(a.id, 'CANCELLED')}
+                          className="px-4 py-2 bg-red-500/10 text-red-400 rounded-xl text-sm font-semibold border border-red-500/20 hover:bg-red-500 hover:text-white transition-all duration-300"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                    {a.status === 'CONFIRMED' && (
+                      <button
+                        onClick={() => updateStatus(a.id, 'COMPLETED')}
+                        className="px-4 py-2 bg-green-500/10 text-green-400 rounded-xl text-sm font-semibold border border-green-500/20 hover:bg-green-500 hover:text-white transition-all duration-300"
+                      >
+                        Mark Completed
+                      </button>
+                    )}
+                  </div>
+                </motion.li>
+              ))}
+            </ul>
+          )}
+        </div>
       )}
-      {!loading && list.length === 0 && <p className="text-gray-500">No appointments.</p>}
-    </div>
+    </motion.div>
   );
 }
