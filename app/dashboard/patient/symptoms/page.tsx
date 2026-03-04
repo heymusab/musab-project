@@ -96,7 +96,7 @@ export default function SymptomCheckerPage() {
             <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 max-w-md mx-auto">
               <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center text-3xl mb-6 border border-white/5">💬</div>
               <p className="text-white font-semibold mb-2">Ready to assist you</p>
-              <p className="text-sm">Describe your symptoms (e.g., "I have a sharp pain in my lower back") and I’ll suggest the right specialist.</p>
+              <p className="text-sm">Describe your symptoms (e.g., &quot;I have a sharp pain in my lower back&quot;) and I&apos;ll suggest the right specialist.</p>
               <p className="mt-4 text-[10px] uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-white/5">Educational use only</p>
             </div>
           )}
@@ -109,8 +109,8 @@ export default function SymptomCheckerPage() {
             >
               <div
                 className={`max-w-[85%] rounded-2xl px-5 py-3.5 text-sm shadow-lg ${msg.role === 'user'
-                    ? 'rounded-br-none bg-gradient-to-r from-cyan-600 to-blue-700 text-white border border-white/10 shadow-cyan-500/10'
-                    : 'rounded-bl-none border border-white/10 bg-white/5 text-gray-100 backdrop-blur-md'
+                  ? 'rounded-br-none bg-gradient-to-r from-cyan-600 to-blue-700 text-white border border-white/10 shadow-cyan-500/10'
+                  : 'rounded-bl-none border border-white/10 bg-white/5 text-gray-100 backdrop-blur-md'
                   }`}
               >
                 <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
