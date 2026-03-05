@@ -2,7 +2,8 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import Link from 'next/link';
-import { LayoutDashboard, Users, UserCog, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, UserCog, LogOut, Stethoscope } from 'lucide-react';
+import SignOutButton from '@/components/SignOutButton';
 
 export default async function AdminLayout({
   children,
@@ -20,12 +21,12 @@ export default async function AdminLayout({
       <nav className="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/10 px-6 py-4 shadow-2xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-10">
-            <Link href="/dashboard/admin" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.5)] group-hover:scale-110 transition-transform">
-                <span className="text-white font-black text-xl">M</span>
+            <Link href="/dashboard/admin" className="flex items-center gap-3 group transition-all hover:scale-105">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.5)] group-hover:rotate-12 transition-transform">
+                <Stethoscope className="text-white w-6 h-6" strokeWidth={2.5} />
               </div>
-              <span className="font-bold text-xl tracking-tight text-white hidden md:block">
-                Medi<span className="text-cyan-400">Connect</span> Admin
+              <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent tracking-tight hidden md:block">
+                MediConnect <span className="text-cyan-400">Admin</span>
               </span>
             </Link>
 
@@ -52,13 +53,12 @@ export default async function AdminLayout({
               <span className="text-sm font-bold text-white leading-tight">{session.user.name}</span>
               <span className="text-[10px] text-cyan-500 uppercase tracking-widest font-black opacity-80">Administrator</span>
             </div>
-            <Link
-              href="/api/auth/signout"
+            <SignOutButton
               className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-lg"
               title="Sign Out"
             >
               <LogOut className="w-5 h-5" />
-            </Link>
+            </SignOutButton>
           </div>
         </div>
       </nav>

@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion, useMotionValue, useSpring, useTransform, Variants } from 'framer-motion';
+import { Stethoscope } from 'lucide-react';
 
 // 3D Tilt Card Component
 function TiltCard({ children, className }: { children: React.ReactNode, className?: string }) {
@@ -91,8 +92,8 @@ export default function Page() {
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16 relative">
                         <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.5)]">
-                                <span className="text-white font-bold text-sm">M</span>
+                            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.5)] group transition-all hover:rotate-12">
+                                <Stethoscope className="text-white w-5 h-5" strokeWidth={2.5} />
                             </div>
                             <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                                 MediConnect
@@ -293,7 +294,7 @@ export default function Page() {
                         <div>
                             <div className="flex items-center space-x-2 mb-6">
                                 <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center">
-                                    <span className="text-white font-bold text-sm">M</span>
+                                    <Stethoscope className="text-white w-5 h-5" strokeWidth={2.5} />
                                 </div>
                                 <span className="text-2xl font-bold text-white">MediConnect</span>
                             </div>

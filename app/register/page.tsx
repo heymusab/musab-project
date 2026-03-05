@@ -9,7 +9,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'PATIENT' | 'DOCTOR' | 'ADMIN'>('PATIENT');
+  const [role, setRole] = useState<'PATIENT' | 'DOCTOR'>('PATIENT');
   const [error, setError] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -58,13 +58,16 @@ export default function RegisterPage() {
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full"></div>
 
         <div className="text-center mb-8 relative z-10">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
+          <Link href="/" className="inline-flex items-center gap-3 mb-4 group transition-all hover:scale-105">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.5)]">
               <span className="text-white font-bold text-lg">M</span>
             </div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent tracking-tight">
+              MediConnect
+            </span>
           </Link>
           <h1 className="text-3xl font-bold text-white tracking-tight">Create Account</h1>
-          <p className="text-gray-400 mt-2">Join as a Patient, Doctor, or Admin</p>
+          <p className="text-gray-400 mt-2">Join as a Patient or Doctor</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
@@ -76,7 +79,7 @@ export default function RegisterPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">I am a...</label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <label className={`flex flex-col items-center justify-center gap-1 cursor-pointer p-3 rounded-xl border transition-all ${role === 'PATIENT' ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.2)]' : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'}`}>
                 <input
                   type="radio"
@@ -96,16 +99,6 @@ export default function RegisterPage() {
                   className="hidden"
                 />
                 <span className="font-bold text-xs uppercase tracking-wider">Doctor</span>
-              </label>
-              <label className={`flex flex-col items-center justify-center gap-1 cursor-pointer p-3 rounded-xl border transition-all ${role === 'ADMIN' ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.2)]' : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'}`}>
-                <input
-                  type="radio"
-                  name="role"
-                  checked={role === 'ADMIN'}
-                  onChange={() => setRole('ADMIN')}
-                  className="hidden"
-                />
-                <span className="font-bold text-xs uppercase tracking-wider">Admin</span>
               </label>
             </div>
             {error.role && (

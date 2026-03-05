@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { Stethoscope } from 'lucide-react';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -59,10 +60,13 @@ function LoginForm() {
       <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full"></div>
 
       <div className="text-center mb-8 relative z-10">
-        <Link href="/" className="inline-flex items-center gap-2 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.5)]">
-            <span className="text-white font-bold text-lg">M</span>
+        <Link href="/" className="inline-flex items-center gap-3 mb-4 group transition-all hover:scale-105">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_15px_rgba(56,189,248,0.5)] group-hover:rotate-12 transition-transform">
+            <Stethoscope className="text-white w-6 h-6" strokeWidth={2.5} />
           </div>
+          <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent tracking-tight">
+            MediConnect
+          </span>
         </Link>
         <h1 className="text-3xl font-bold text-white tracking-tight">Welcome Back</h1>
         <p className="text-gray-400 mt-2">Sign in to your dashboard</p>

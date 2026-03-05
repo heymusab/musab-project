@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import Link from 'next/link';
+import SignOutButton from '@/components/SignOutButton';
+import { Stethoscope } from 'lucide-react';
 
 export default async function DoctorLayout({
   children,
@@ -18,11 +20,13 @@ export default async function DoctorLayout({
       <nav className="backdrop-blur-xl bg-black/20 border-b border-white/5 px-6 py-4 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-8">
-            <Link href="/dashboard/doctor" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_10px_rgba(56,189,248,0.3)]">
-                <span className="text-white font-bold text-sm">M</span>
+            <Link href="/dashboard/doctor" className="flex items-center gap-2 group transition-all hover:scale-105">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_10px_rgba(56,189,248,0.3)] group-hover:rotate-12 transition-transform">
+                <Stethoscope className="text-white w-5 h-5" strokeWidth={2.5} />
               </div>
-              <span className="font-bold text-lg text-white tracking-tight">MediConnect <span className="text-cyan-400 text-sm font-medium ml-1">Doctor</span></span>
+              <span className="text-lg font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent tracking-tight">
+                MediConnect <span className="text-cyan-400 text-sm font-medium ml-1">Doctor</span>
+              </span>
             </Link>
             <div className="hidden md:flex items-center gap-6">
               <Link href="/dashboard/doctor" className="text-sm font-medium text-gray-300 hover:text-cyan-400 transition-colors">
@@ -41,12 +45,11 @@ export default async function DoctorLayout({
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-400 hidden sm:block">{session.user.email}</span>
-            <Link
-              href="/api/auth/signout"
+            <SignOutButton
               className="px-4 py-2 text-sm font-semibold text-white bg-white/10 hover:bg-red-500/20 hover:text-red-400 rounded-lg transition-colors border border-white/5 hover:border-red-500/30"
             >
               Sign out
-            </Link>
+            </SignOutButton>
           </div>
         </div>
       </nav>
