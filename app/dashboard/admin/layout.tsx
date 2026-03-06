@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import Link from 'next/link';
-import { LayoutDashboard, Users, UserCog, LogOut, Stethoscope } from 'lucide-react';
+import { LayoutDashboard, Users, UserCog, LogOut, Stethoscope, Mail } from 'lucide-react';
 import SignOutButton from '@/components/SignOutButton';
 
 export default async function AdminLayout({
@@ -35,6 +35,7 @@ export default async function AdminLayout({
                 { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
                 { name: 'Users', href: '/dashboard/admin/users', icon: UserCog },
                 { name: 'Doctors', href: '/dashboard/admin/doctors', icon: Users },
+                { name: 'Messages', href: '/dashboard/admin/messages', icon: Mail },
               ].map((item) => (
                 <Link
                   key={item.href}

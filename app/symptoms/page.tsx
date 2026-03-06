@@ -45,9 +45,9 @@ export default function PublicSymptomCheckerPage() {
           <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to MediConnect
         </Link>
 
-        <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">AI Symptom <span className="text-cyan-500">Checker</span></h1>
+        <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">AI Health <span className="text-cyan-500">Assistant</span></h1>
         <p className="text-gray-400 text-lg mb-10 leading-relaxed max-w-lg">
-          Describe your symptoms naturally and we&apos;ll help you find the right medical specialist.
+          Share your health concerns naturally and let our AI provide instant medical guidance.
         </p>
 
         <div className="space-y-6">

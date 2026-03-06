@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
 import { ChatBot } from '@/components/ChatBot';
+import { Outfit } from 'next/font/google';
+
+const outfit = Outfit({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'MediConnect - Healthcare Made Simple',
@@ -10,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={outfit.className}>
       <body>
         <Providers>
           {children}

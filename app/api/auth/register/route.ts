@@ -56,7 +56,7 @@ export async function POST(req: Request) {
           experience: 0,
           fee: 0,
           bio: '',
-          approved: true, // Auto-approve doctors so they show up
+          approved: false, // Wait for admin approval
         },
       });
     }
