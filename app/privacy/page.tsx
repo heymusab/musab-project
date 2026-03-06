@@ -32,7 +32,7 @@ export default function PrivacyPage() {
                 >
                     <div className="text-center mb-16">
                         <h1 className="text-5xl font-black mb-4">Privacy Policy</h1>
-                        <p className="text-gray-400">Your health data is your own. We're just the keepers.</p>
+                        <p className="text-gray-400">Your health data is your own. We&apos;re just the keepers.</p>
                         <div className="w-24 h-1 bg-cyan-500 mx-auto mt-8 rounded-full" />
                     </div>
 

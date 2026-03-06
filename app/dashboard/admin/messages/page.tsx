@@ -120,7 +120,7 @@ export default function AdminMessagesPage() {
                                         <div className="flex gap-4 bg-black/20 rounded-2xl p-6 border border-white/5">
                                             <MessageSquare className="w-6 h-6 text-cyan-500 flex-shrink-0 mt-1" />
                                             <p className="text-gray-300 leading-relaxed text-lg italic whitespace-pre-wrap">
-                                                "{msg.message}"
+                                                &quot;{msg.message}&quot;
                                             </p>
                                         </div>
                                     </div>

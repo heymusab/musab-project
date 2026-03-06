@@ -73,7 +73,7 @@ export default async function DoctorLayout({
             </div>
             <h1 className="text-4xl font-black text-white mb-4 tracking-tight">Account Pending Approval</h1>
             <p className="text-gray-400 max-w-md mx-auto leading-relaxed mb-10 italic">
-              "Thank you for joining MediConnect. Our administrative team is currently verifying your medical credentials. This usually takes 24-48 hours."
+              &quot;Thank you for joining MediConnect. Our administrative team is currently verifying your medical credentials. This usually takes 24-48 hours.&quot;
             </p>
 
             <div className="grid sm:grid-cols-3 gap-6 w-full max-w-2xl">
@@ -87,8 +87,8 @@ export default async function DoctorLayout({
                   <h3 className="font-bold text-white text-sm uppercase tracking-wider mb-1">{step.title}</h3>
                   <p className="text-xs text-gray-500 mb-2">{step.desc}</p>
                   <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${step.status === 'Done' ? 'bg-green-500/10 text-green-500' :
-                      step.status === 'In Progress' ? 'bg-cyan-500/10 text-cyan-400' :
-                        'bg-white/5 text-gray-600'
+                    step.status === 'In Progress' ? 'bg-cyan-500/10 text-cyan-400' :
+                      'bg-white/5 text-gray-600'
                     }`}>
                     {step.status}
                   </span>
