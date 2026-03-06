@@ -127,9 +127,9 @@ export default function CareersPage() {
                     </div>
 
                     <div className="mt-16 text-center bg-gradient-to-r from-cyan-500/10 to-blue-600/10 p-12 rounded-[3rem] border border-white/5">
-                        <h3 className="text-xl font-bold text-white mb-4">Don't see a perfect fit?</h3>
+                        <h3 className="text-xl font-bold text-white mb-4">Don&apos;t see a perfect fit?</h3>
                         <p className="text-gray-400 mb-8 max-w-lg mx-auto italic">
-                            We're always looking for talented people who share our mission. Send us your resume and we'll keep you in mind for future roles.
+                            We&apos;re always looking for talented people who share our mission. Send us your resume and we&apos;ll keep you in mind for future roles.
                         </p>
                         <a href="mailto:careers@mediconnect.com" className="text-cyan-400 font-bold hover:underline">careers@mediconnect.com</a>
                     </div>

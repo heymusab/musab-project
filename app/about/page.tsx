@@ -83,7 +83,7 @@ export default function AboutPage() {
                                 Modernizing the Bridge Between Doctors and Patients.
                             </h2>
                             <p className="text-lg text-gray-400 leading-relaxed">
-                                We've spent thousands of hours talking to doctors and patients to understand their pain points. The result is a platform that isn't just a booking site, but a complete health ecosystem. From AI-driven symptom checking to secure video consultations, we're building the future of medicine.
+                                We&apos;ve spent thousands of hours talking to doctors and patients to understand their pain points. The result is a platform that isn&apos;t just a booking site, but a complete health ecosystem. From AI-driven symptom checking to secure video consultations, we&apos;re building the future of medicine.
                             </p>
                         </motion.div>
                         <motion.div
