@@ -98,10 +98,8 @@
   inset: 0;
   z-index: -1;
   background-image: 
-    radial-gradient(at 40% 20%, hsla(228,100%,74%,0.1) 0px, transparent 50%),
-    radial-gradient(at 80% 0%, hsla(189,100%,56%,0.15) 0px, transparent 50%),
-    radial-gradient(at 0% 50%, hsla(355,100%,93%,0.05) 0px, transparent 50%);
-  filter: blur(80px);
-  background-attachment: fixed;
+    radial-gradient(at 40% 20%, hsla(228,100%,74%,0.15) 0px, transparent 60%),
+    radial-gradient(at 80% 0%, hsla(189,100%,56%,0.2) 0px, transparent 60%),
+    radial-gradient(at 0% 50%, hsla(355,100%,93%,0.1) 0px, transparent 60%);
   pointer-events: none;
 }

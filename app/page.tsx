@@ -2,8 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { motion, useMotionValue, useSpring, useTransform, Variants } from 'framer-motion';
-import { Stethoscope } from 'lucide-react';
+import { motion, useMotionValue, useSpring, useTransform, Variants, AnimatePresence } from 'framer-motion';
+import { Stethoscope, Menu, X } from 'lucide-react';
 
 // 3D Tilt Card Component
 function TiltCard({ children, className }: { children: React.ReactNode, className?: string }) {
@@ -58,9 +58,108 @@ const staggerContainer: Variants = {
     visible: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.1 } }
 };
 
+// Isolated Contact Form Component to prevent re-rendering the whole page on keystrokes
+function ContactForm({ t, lang }: { t: any, lang: string }) {
+    const [formData, setFormData] = React.useState({ name: '', email: '', message: '' });
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [submitStatus, setSubmitStatus] = React.useState<'idle' | 'success' | 'error'>('idle');
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setSubmitStatus('idle');
+
+        try {
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+
+            if (res.ok) {
+                setSubmitStatus('success');
+                setFormData({ name: '', email: '', message: '' });
+            } else {
+                setSubmitStatus('error');
+            }
+        } catch (error) {
+            setSubmitStatus('error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                    <label className={`text-sm font-medium text-gray-300 ${lang === 'ur' ? 'mr-1' : 'ml-1'}`}>{t.contact.name}</label>
+                    <input
+                        type="text"
+                        placeholder="John Doe"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-cyan-500/50 transition-colors"
+                        required
+                    />
+                </div>
+                <div className="space-y-2">
+                    <label className={`text-sm font-medium text-gray-300 ${lang === 'ur' ? 'mr-1' : 'ml-1'}`}>{t.contact.email}</label>
+                    <input
+                        type="email"
+                        placeholder="john@example.com"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-cyan-500/50 transition-colors"
+                        required
+                    />
+                </div>
+            </div>
+            <div className="space-y-2">
+                <label className={`text-sm font-medium text-gray-300 ${lang === 'ur' ? 'mr-1' : 'ml-1'}`}>{t.contact.msg}</label>
+                <textarea
+                    rows={4}
+                    placeholder="I'd like to schedule a demo for my clinic..."
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className={`w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-cyan-500/50 transition-colors resize-none ${lang === 'ur' ? 'text-right' : 'text-left'}`}
+                    required
+                />
+            </div>
+
+            <button
+                disabled={isSubmitting}
+                className={`w-full py-5 rounded-2xl font-bold shadow-lg transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-3 ${isSubmitting ? 'bg-gray-600 cursor-not-allowed' : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-cyan-500/20'
+                    }`}
+            >
+                {isSubmitting ? (
+                    <>
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>{t.contact.sending}</span>
+                    </>
+                ) : (
+                    <span>{t.contact.btn}</span>
+                )}
+            </button>
+
+            {submitStatus === 'success' && (
+                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-green-400 text-center font-medium">
+                    {t.contact.success}
+                </motion.p>
+            )}
+            {submitStatus === 'error' && (
+                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-red-400 text-center font-medium">
+                    {t.contact.error}
+                </motion.p>
+            )}
+        </form>
+    );
+}
+
 export default function Page() {
 
     const [lang, setLang] = React.useState<'en' | 'ur'>('en');
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
     const translations = {
         en: {
@@ -168,39 +267,10 @@ export default function Page() {
         { number: "4.9★", label: t.stats.r }
     ];
 
-    const [formData, setFormData] = React.useState({ name: '', email: '', message: '' });
-    const [isSubmitting, setIsSubmitting] = React.useState(false);
-    const [submitStatus, setSubmitStatus] = React.useState<'idle' | 'success' | 'error'>('idle');
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-        setSubmitStatus('idle');
-
-        try {
-            const res = await fetch('/api/contact', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
-
-            if (res.ok) {
-                setSubmitStatus('success');
-                setFormData({ name: '', email: '', message: '' });
-            } else {
-                setSubmitStatus('error');
-            }
-        } catch (error) {
-            setSubmitStatus('error');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
     return (
         <div className={`min-h-screen bg-mesh text-gray-100 overflow-hidden font-sans ${lang === 'ur' ? 'text-right' : 'text-left'}`} dir={lang === 'ur' ? 'rtl' : 'ltr'}>
             {/* Navigation */}
-            <nav className="backdrop-blur-xl bg-black/20 border-b border-white/5 sticky top-0 z-50">
+            <nav className="backdrop-blur-md lg:backdrop-blur-xl bg-black/20 border-b border-white/5 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16 relative">
                         <div className="flex items-center gap-3">
@@ -235,12 +305,89 @@ export default function Page() {
                             <Link href="/login" className="px-4 py-2 text-gray-300 hover:text-white transition-colors">
                                 {t.nav.signIn}
                             </Link>
-                            <Link href="/register" className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white backdrop-blur-md transition-all duration-300">
+                            <Link href="/register" className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white backdrop-blur-md transition-all duration-300 whitespace-nowrap">
                                 {t.nav.getStarted}
                             </Link>
                         </div>
+
+                        {/* Mobile Menu Button */}
+                        <div className="md:hidden flex items-center gap-4">
+                            <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+                                <button
+                                    onClick={() => setLang('en')}
+                                    className={`px-2 py-1 rounded-lg text-[10px] font-black tracking-widest uppercase transition-all ${lang === 'en' ? 'bg-cyan-500 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                                >
+                                    EN
+                                </button>
+                                <button
+                                    onClick={() => setLang('ur')}
+                                    className={`px-2 py-1 rounded-lg text-[10px] font-black tracking-widest uppercase transition-all ${lang === 'ur' ? 'bg-cyan-500 text-white shadow-lg font-urdu' : 'text-gray-500 hover:text-white'}`}
+                                >
+                                    اردو
+                                </button>
+                            </div>
+                            <button
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className="text-gray-300 hover:text-white focus:outline-none p-2 border border-white/10 rounded-lg bg-white/5"
+                                aria-label="Toggle menu"
+                            >
+                                {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                            </button>
+                        </div>
                     </div>
                 </div>
+
+                {/* Mobile Navigation Dropdown */}
+                <AnimatePresence>
+                    {isMobileMenuOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="md:hidden bg-black/95 backdrop-blur-md border-b border-white/10 overflow-hidden absolute w-full left-0 top-full"
+                        >
+                            <div className="flex flex-col px-6 py-6 space-y-4">
+                                <a
+                                    href="#features"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="text-gray-300 hover:text-white py-3 transition-colors border-b border-white/5 text-lg font-medium"
+                                >
+                                    {t.nav.features}
+                                </a>
+                                <a
+                                    href="#contact"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="text-gray-300 hover:text-white py-3 transition-colors border-b border-white/5 text-lg font-medium"
+                                >
+                                    {t.nav.contact}
+                                </a>
+                                <Link
+                                    href="/symptoms"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="text-gray-300 hover:text-white py-3 transition-colors border-b border-white/5 text-lg font-medium"
+                                >
+                                    {t.nav.ai}
+                                </Link>
+                                <div className="pt-4 flex flex-col gap-4">
+                                    <Link
+                                        href="/login"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="text-center py-4 text-gray-300 hover:text-white border border-white/10 rounded-xl transition-colors font-medium"
+                                    >
+                                        {t.nav.signIn}
+                                    </Link>
+                                    <Link
+                                        href="/register"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="text-center py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold shadow-lg"
+                                    >
+                                        {t.nav.getStarted}
+                                    </Link>
+                                </div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </nav>
 
             {/* Hero Section */}
@@ -260,13 +407,13 @@ export default function Page() {
                                 </div>
                             </motion.div>
 
-                            <motion.h1 variants={fadeInUp} className={`text-5xl lg:text-7xl font-extrabold leading-tight mb-6 tracking-tight text-white drop-shadow-lg ${lang === 'ur' ? 'font-urdu leading-[1.3]' : ''}`}>
+                            <motion.h1 variants={fadeInUp} className={`text-4xl sm:text-5xl lg:text-7xl font-extrabold leading-tight mb-6 tracking-tight text-white drop-shadow-lg ${lang === 'ur' ? 'font-urdu leading-[1.3]' : ''}`}>
                                 {t.hero.title1}
                                 <br />
                                 <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 bg-clip-text text-transparent"> {t.hero.title2}</span>
                             </motion.h1>
 
-                            <motion.p variants={fadeInUp} className="text-xl text-gray-300 mb-8 leading-relaxed max-w-lg">
+                            <motion.p variants={fadeInUp} className="text-lg md:text-xl text-gray-300 mb-8 leading-relaxed max-w-lg">
                                 {t.hero.desc}
                             </motion.p>
 
@@ -283,7 +430,7 @@ export default function Page() {
                             <motion.div variants={fadeInUp} className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-white/10">
                                 {stats.map((stat, index) => (
                                     <div key={index} className="text-left group cursor-default">
-                                        <div className="text-4xl font-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-1 tracking-tighter transition-all group-hover:scale-110 origin-left duration-300">
+                                        <div className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-1 tracking-tighter transition-all group-hover:scale-110 origin-left duration-300">
                                             {stat.number}
                                         </div>
                                         <div className="text-[10px] text-gray-500 font-black uppercase tracking-[0.25em] opacity-70 group-hover:opacity-100 transition-opacity">
@@ -303,7 +450,7 @@ export default function Page() {
                         >
                             <TiltCard className="w-full max-w-lg">
                                 {/* Dashboard Card */}
-                                <div className={`bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-6 md:p-8 preserve-3d ${lang === 'ur' ? 'text-right' : 'text-left'}`}>
+                                <div className={`bg-black/40 backdrop-blur-md lg:backdrop-blur-xl rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-6 md:p-8 preserve-3d ${lang === 'ur' ? 'text-right' : 'text-left'}`}>
                                     <div className="flex items-center justify-between mb-8 translate-z-20">
                                         <h3 className="text-xl font-semibold text-white">{lang === 'ur' ? 'پیشنٹ ڈیش بورڈ' : 'Patient Dashboard'}</h3>
                                         <div className="flex items-center bg-green-500/20 px-3 py-1 rounded-full border border-green-500/30 gap-2">
@@ -337,7 +484,7 @@ export default function Page() {
                                     </div>
 
                                     {/* Abstract Floating Element */}
-                                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/30 blur-3xl rounded-full translate-z-10 pointer-events-none"></div>
+                                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/30 blur-2xl lg:blur-3xl rounded-full translate-z-10 pointer-events-none"></div>
                                 </div>
                             </TiltCard>
                         </motion.div>
@@ -355,10 +502,10 @@ export default function Page() {
                         transition={{ duration: 0.8 }}
                         className="text-center mb-16"
                     >
-                        <h2 className={`text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight ${lang === 'ur' ? 'font-urdu' : ''}`}>
+                        <h2 className={`text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight ${lang === 'ur' ? 'font-urdu' : ''}`}>
                             {t.features.title} <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">{t.features.titleColor}</span>
                         </h2>
-                        <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+                        <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
                             {t.features.desc}
                         </p>
                     </motion.div>
@@ -373,9 +520,9 @@ export default function Page() {
                                 transition={{ duration: 0.6, delay: index * 0.2 }}
                             >
                                 <TiltCard>
-                                    <div className={`p-8 bg-black/40 backdrop-blur-xl rounded-3xl border border-white/10 hover:border-cyan-500/50 hover:bg-white/10 transition-all duration-300 h-full flex flex-col translate-z-10 preserve-3d shadow-2xl ${lang === 'ur' ? 'items-end text-right' : 'items-start text-left'}`}>
-                                        <div className="text-5xl mb-6 translate-z-30 drop-shadow-lg">{feature.icon}</div>
-                                        <h3 className="text-2xl font-bold text-white mb-3 translate-z-20">{feature.title}</h3>
+                                    <div className={`p-8 bg-black/40 backdrop-blur-md lg:backdrop-blur-xl rounded-3xl border border-white/10 hover:border-cyan-500/50 hover:bg-white/10 transition-all duration-300 h-full flex flex-col translate-z-10 preserve-3d shadow-2xl ${lang === 'ur' ? 'items-end text-right' : 'items-start text-left'}`}>
+                                        <div className="text-4xl md:text-5xl mb-6 translate-z-30 drop-shadow-lg">{feature.icon}</div>
+                                        <h3 className="text-xl md:text-2xl font-bold text-white mb-3 translate-z-20">{feature.title}</h3>
                                         <p className="text-gray-400 leading-relaxed translate-z-10">{feature.description}</p>
                                     </div>
                                 </TiltCard>
@@ -400,10 +547,10 @@ export default function Page() {
                         <div className="bg-black rounded-full px-6 py-2 text-white font-medium">{t.cta.ready}</div>
                     </div>
 
-                    <h2 className={`text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight ${lang === 'ur' ? 'font-urdu' : ''}`}>
+                    <h2 className={`text-3xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight ${lang === 'ur' ? 'font-urdu' : ''}`}>
                         {t.cta.title}
                     </h2>
-                    <p className="text-2xl text-gray-400 mb-10 max-w-2xl mx-auto">
+                    <p className="text-lg md:text-2xl text-gray-400 mb-10 max-w-2xl mx-auto">
                         {t.cta.desc}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-6 justify-center">
@@ -428,79 +575,17 @@ export default function Page() {
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
-                        className="bg-black/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 p-8 md:p-16 shadow-2xl relative overflow-hidden"
+                        className="bg-black/40 backdrop-blur-lg lg:backdrop-blur-2xl rounded-[2.5rem] border border-white/10 p-8 md:p-16 shadow-2xl relative overflow-hidden"
                     >
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[100px] pointer-events-none" />
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-600/10 blur-[100px] pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-2xl lg:blur-[100px] pointer-events-none" />
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-600/10 blur-2xl lg:blur-[100px] pointer-events-none" />
 
                         <div className="text-center mb-12">
-                            <h2 className={`text-4xl font-bold text-white mb-4 ${lang === 'ur' ? 'font-urdu' : ''}`}>{t.contact.title}</h2>
+                            <h2 className={`text-3xl md:text-4xl font-bold text-white mb-4 ${lang === 'ur' ? 'font-urdu' : ''}`}>{t.contact.title}</h2>
                             <p className="text-gray-400">{t.contact.desc}</p>
                         </div>
 
-                        <form className="space-y-6" onSubmit={handleSubmit}>
-                            <div className="grid md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className={`text-sm font-medium text-gray-300 ${lang === 'ur' ? 'mr-1' : 'ml-1'}`}>{t.contact.name}</label>
-                                    <input
-                                        type="text"
-                                        placeholder="John Doe"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-cyan-500/50 transition-colors"
-                                        required
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className={`text-sm font-medium text-gray-300 ${lang === 'ur' ? 'mr-1' : 'ml-1'}`}>{t.contact.email}</label>
-                                    <input
-                                        type="email"
-                                        placeholder="john@example.com"
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-cyan-500/50 transition-colors"
-                                        required
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <label className={`text-sm font-medium text-gray-300 ${lang === 'ur' ? 'mr-1' : 'ml-1'}`}>{t.contact.msg}</label>
-                                <textarea
-                                    rows={4}
-                                    placeholder="I'd like to schedule a demo for my clinic..."
-                                    value={formData.message}
-                                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                    className={`w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white focus:outline-none focus:border-cyan-500/50 transition-colors resize-none ${lang === 'ur' ? 'text-right' : 'text-left'}`}
-                                    required
-                                />
-                            </div>
-
-                            <button
-                                disabled={isSubmitting}
-                                className={`w-full py-5 rounded-2xl font-bold shadow-lg transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-3 ${isSubmitting ? 'bg-gray-600 cursor-not-allowed' : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:shadow-cyan-500/20'
-                                    }`}
-                            >
-                                {isSubmitting ? (
-                                    <>
-                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        <span>{t.contact.sending}</span>
-                                    </>
-                                ) : (
-                                    <span>{t.contact.btn}</span>
-                                )}
-                            </button>
-
-                            {submitStatus === 'success' && (
-                                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-green-400 text-center font-medium">
-                                    {t.contact.success}
-                                </motion.p>
-                            )}
-                            {submitStatus === 'error' && (
-                                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-red-400 text-center font-medium">
-                                    {t.contact.error}
-                                </motion.p>
-                            )}
-                        </form>
+                        <ContactForm t={t} lang={lang} />
                     </motion.div>
                 </div>
             </section>
