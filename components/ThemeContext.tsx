@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type Theme = 'day' | 'night';
 
@@ -14,33 +14,19 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('night');
-  const [isAuto, setIsAuto] = useState(true);
-
-  useEffect(() => {
-    if (!isAuto) return;
-
-    const checkTime = () => {
-      const hour = new Date().getHours();
-      // Day: 6am to 6pm
-      const newTheme = hour >= 6 && hour < 18 ? 'day' : 'night';
-      setTheme(newTheme);
-    };
-
-    checkTime();
-    const interval = setInterval(checkTime, 60000); // Check every minute
-    return () => clearInterval(interval);
-  }, [isAuto]);
+  const theme: Theme = 'night';
+  const isAuto = false;
 
   useEffect(() => {
     document.body.classList.remove('day', 'night');
     document.body.classList.add(theme);
-  }, [theme]);
+  }, []);
 
   const toggleTheme = () => {
-    setIsAuto(false);
-    setTheme(prev => (prev === 'day' ? 'night' : 'day'));
+    // Theme shifting disabled per user request
   };
+
+  const setIsAuto = () => {};
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, isAuto, setIsAuto }}>

@@ -23,24 +23,7 @@
     --glass-border: rgba(255, 255, 255, 0.05);
   }
 
-  .day {
-    /* Day Theme (Bright Crystal Medical look) */
-    --background: 210 40% 98%;
-    --foreground: 226 80% 4%;
-    --card: 210 40% 100%;
-    --card-foreground: 226 80% 10%;
-    --primary: 217 91% 55%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 94%;
-    --muted: 210 20% 90%;
-    --muted-foreground: 215 25% 40%;
-    --accent: 217 91% 55%;
-    --border: 217 30% 90%;
-    --input: 217 30% 95%;
-    --ring: 217 91% 55%;
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(37, 99, 235, 0.1);
-  }
+
 
   * {
     border-color: hsl(var(--border));
@@ -119,11 +102,7 @@
   animation: mesh-move-2 30s infinite alternate-reverse ease-in-out;
 }
 
-.day .bg-mesh::before,
-.day .bg-mesh::after {
-  opacity: 0.3;
-  filter: blur(120px);
-}
+
 
 @keyframes mesh-move-1 {
   0% { transform: translate(0, 0) scale(1) rotate(0deg); }
