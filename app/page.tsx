@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { motion, useMotionValue, useSpring, useTransform, Variants, AnimatePresence } from 'framer-motion';
 import { Stethoscope, Menu, X } from 'lucide-react';
+import { useLanguage } from '@/components/LanguageContext';
 
 // 3D Tilt Card Component
 function TiltCard({ children, className }: { children: React.ReactNode, className?: string }) {
@@ -157,13 +158,12 @@ function ContactForm({ t, lang }: { t: any, lang: string }) {
 }
 
 export default function Page() {
-
-    const [lang, setLang] = React.useState<'en' | 'ur'>('en');
+    const { lang, setLang } = useLanguage();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
     const translations = {
         en: {
-            nav: { features: "Features", contact: "Contact", ai: "AI Health Assistant", signIn: "Sign In", getStarted: "Get Started" },
+            nav: { features: "Features", contact: "Contact", about: "About Us", signIn: "Sign In", getStarted: "Get Started" },
             hero: {
                 badge: "Users Growing Weekly",
                 title1: "Healthcare",
@@ -201,7 +201,7 @@ export default function Page() {
             }
         },
         ur: {
-            nav: { features: "خصوصیات", contact: "رابطہ", ai: "اے آئی اسسٹنٹ", signIn: "سائن ان", getStarted: "شروع کریں" },
+            nav: { features: "خصوصیات", contact: "رابطہ", about: "ہمارے بارے میں", signIn: "سائن ان", getStarted: "شروع کریں" },
             hero: {
                 badge: "صارفین ہر ہفتے بڑھ رہے ہیں",
                 title1: "صحت کا حصول",
@@ -268,9 +268,9 @@ export default function Page() {
     ];
 
     return (
-        <div className={`min-h-screen bg-mesh text-gray-100 overflow-hidden font-sans ${lang === 'ur' ? 'text-right' : 'text-left'}`} dir={lang === 'ur' ? 'rtl' : 'ltr'}>
+        <div className={`selection:bg-blue-500/30 overflow-hidden ${lang === 'ur' ? 'text-right' : 'text-left'}`} dir={lang === 'ur' ? 'rtl' : 'ltr'}>
             {/* Navigation */}
-            <nav className="backdrop-blur-md lg:backdrop-blur-xl bg-black/20 border-b border-white/5 sticky top-0 z-50">
+            <nav className="glass-card sticky top-0 z-[100] mt-4 mx-4 rounded-3xl">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16 relative">
                         <div className="flex items-center gap-3">
@@ -282,32 +282,48 @@ export default function Page() {
                             </span>
                         </div>
 
-                        <div className="hidden md:flex items-center gap-10">
-                            <a href="#features" className="text-gray-300 hover:text-white transition-colors">{t.nav.features}</a>
-                            <a href="#contact" className="text-gray-300 hover:text-white transition-colors">{t.nav.contact}</a>
-                            <Link href="/symptoms" className="text-gray-300 hover:text-white transition-colors">{t.nav.ai}</Link>
+                        <div className="hidden lg:flex items-center gap-10 xl:gap-14">
+                            <a href="#features" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-white transition-all">{t.nav.features}</a>
+                            <a href="#contact" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-white transition-all">{t.nav.contact}</a>
+                            <Link
+                                href="/about"
+                                className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-white transition-all"
+                            >
+                                {t.nav.about}
+                            </Link>
+                            
+                            <div className="flex items-center gap-6">
+                                <Link 
+                                    href="/login" 
+                                    className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all underline decoration-transparent hover:decoration-blue-400 underline-offset-4"
+                                >
+                                    {t.nav.signIn}
+                                </Link>
+                                
+                                <Link 
+                                    href="/register" 
+                                    className="text-[10px] font-black uppercase tracking-widest px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 active:scale-95"
+                                >
+                                    {t.nav.getStarted}
+                                </Link>
+                            </div>
+
 
                             <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
                                 <button
                                     onClick={() => setLang('en')}
-                                    className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest uppercase transition-all ${lang === 'en' ? 'bg-cyan-500 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
+                                    className={`px-3 py-1 rounded-lg text-[8px] font-black tracking-widest uppercase transition-all ${lang === 'en' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-500 hover:text-white'}`}
                                 >
                                     EN
                                 </button>
                                 <button
                                     onClick={() => setLang('ur')}
-                                    className={`px-3 py-1 rounded-lg text-[10px] font-black tracking-widest uppercase transition-all ${lang === 'ur' ? 'bg-cyan-500 text-white shadow-lg font-urdu' : 'text-gray-500 hover:text-white'}`}
+                                    className={`px-3 py-1 rounded-lg text-[8px] font-black tracking-widest uppercase transition-all ${lang === 'ur' ? 'bg-blue-600 text-white shadow-lg font-urdu' : 'text-gray-500 hover:text-white'}`}
                                 >
                                     اردو
                                 </button>
                             </div>
 
-                            <Link href="/login" className="px-4 py-2 text-gray-300 hover:text-white transition-colors">
-                                {t.nav.signIn}
-                            </Link>
-                            <Link href="/register" className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white backdrop-blur-md transition-all duration-300 whitespace-nowrap">
-                                {t.nav.getStarted}
-                            </Link>
                         </div>
 
                         {/* Mobile Menu Button */}
@@ -362,11 +378,11 @@ export default function Page() {
                                     {t.nav.contact}
                                 </a>
                                 <Link
-                                    href="/symptoms"
+                                    href="/about"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="text-gray-300 hover:text-white py-3 transition-colors border-b border-white/5 text-lg font-medium"
+                                    className="text-gray-300 hover:text-white py-3 transition-colors border-b border-white/5 text-lg font-medium flex items-center justify-between"
                                 >
-                                    {t.nav.ai}
+                                    <span>{t.nav.about}</span>
                                 </Link>
                                 <div className="pt-4 flex flex-col gap-4">
                                     <Link
@@ -417,11 +433,14 @@ export default function Page() {
                                 {t.hero.desc}
                             </motion.p>
 
-                            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 mb-14">
-                                <Link href="/register" className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-2xl font-semibold shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] transition-all duration-300 hover:scale-105 text-center">
+                            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-6 mb-16">
+                                <Link href="/register" className="px-10 py-5 bg-blue-600 rounded-3xl text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-blue-600/40 transition-all hover:-translate-y-1 hover:shadow-blue-600/60 glow-blue flex items-center justify-center">
                                     {t.hero.btn1}
                                 </Link>
-                                <Link href="/symptoms" className="px-8 py-4 bg-white/5 backdrop-blur-md border border-white/10 text-white rounded-2xl font-semibold hover:bg-white/10 transition-all duration-300 text-center">
+                                <Link 
+                                    href="/dashboard/patient/symptoms" 
+                                    className="px-10 py-5 glass-card rounded-3xl text-white text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:bg-white/10 flex items-center justify-center border border-white/10"
+                                >
                                     {t.hero.btn2}
                                 </Link>
                             </motion.div>
@@ -450,41 +469,41 @@ export default function Page() {
                         >
                             <TiltCard className="w-full max-w-lg">
                                 {/* Dashboard Card */}
-                                <div className={`bg-black/40 backdrop-blur-md lg:backdrop-blur-xl rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] p-6 md:p-8 preserve-3d ${lang === 'ur' ? 'text-right' : 'text-left'}`}>
-                                    <div className="flex items-center justify-between mb-8 translate-z-20">
-                                        <h3 className="text-xl font-semibold text-white">{lang === 'ur' ? 'پیشنٹ ڈیش بورڈ' : 'Patient Dashboard'}</h3>
-                                        <div className="flex items-center bg-green-500/20 px-3 py-1 rounded-full border border-green-500/30 gap-2">
-                                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                            <span className="text-green-300 text-xs font-semibold tracking-wide uppercase">{lang === 'ur' ? 'آن لائن' : 'ONLINE'}</span>
+                                <div className={`glass-card rounded-[3rem] p-10 lg:p-12 preserve-3d ${lang === 'ur' ? 'text-right' : 'text-left'}`}>
+                                    <div className="flex items-center justify-between mb-10 translate-z-20">
+                                        <h3 className="text-2xl font-black text-white tracking-tighter uppercase">{lang === 'ur' ? 'ڈیش بورڈ' : 'Dashboard'}</h3>
+                                        <div className="flex items-center bg-blue-500/10 px-4 py-2 rounded-2xl border border-blue-500/20 gap-2">
+                                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                                            <span className="text-blue-400 text-[10px] font-black tracking-widest uppercase">{lang === 'ur' ? 'آن لائن' : 'LIVE'}</span>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-4 preserve-3d">
+                                    <div className="space-y-6 preserve-3d">
                                         {/* Card 1 */}
-                                        <div className={`flex items-center ${lang === 'ur' ? 'space-x-reverse' : ''} gap-4 p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition duration-300 translate-z-30 shadow-[0_5px_15px_rgba(0,0,0,0.2)]`}>
-                                            <div className="w-12 h-12 bg-gradient-to-tr from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
+                                        <div className={`flex items-center ${lang === 'ur' ? 'space-x-reverse' : ''} gap-6 p-6 bg-white/[0.02] rounded-3xl border border-white/5 hover:bg-white/[0.05] transition-all duration-500 translate-z-30 shadow-2xl group`}>
+                                            <div className="w-14 h-14 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-black shadow-xl transition-transform group-hover:rotate-6">
                                                 AK
                                             </div>
                                             <div>
-                                                <div className="font-semibold text-white text-lg">{lang === 'ur' ? 'ڈاکٹر عائشہ خان' : 'Dr. Ayesha Khan'}</div>
-                                                <div className="text-sm text-cyan-300">{lang === 'ur' ? 'کارڈیالوجی • آج 2:30 بجے' : 'Cardiology • Today 2:30 PM'}</div>
+                                                <div className="font-black text-white text-lg tracking-tight">{lang === 'ur' ? 'ڈاکٹر عائشہ خان' : 'Dr. Ayesha Khan'}</div>
+                                                <div className="text-[10px] text-blue-400 font-black uppercase tracking-widest">{lang === 'ur' ? 'کارڈیالوجی • آج' : 'Cardiology • Today'}</div>
                                             </div>
                                         </div>
 
                                         {/* Card 2 */}
-                                        <div className={`flex items-center ${lang === 'ur' ? 'space-x-reverse' : ''} gap-4 p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition duration-300 translate-z-40 shadow-[0_10px_20px_rgba(0,0,0,0.3)]`}>
-                                            <div className="w-12 h-12 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white font-bold shadow-lg">
+                                        <div className={`flex items-center ${lang === 'ur' ? 'space-x-reverse' : ''} gap-6 p-6 bg-white/[0.02] rounded-3xl border border-white/5 hover:bg-white/[0.05] transition-all duration-500 translate-z-40 shadow-2xl group`}>
+                                            <div className="w-14 h-14 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-black shadow-xl transition-transform group-hover:-rotate-6">
                                                 FQ
                                             </div>
                                             <div>
-                                                <div className="font-semibold text-white text-lg">{lang === 'ur' ? 'ڈاکٹر فیصل قریشی' : 'Dr. Faisal Qureshi'}</div>
-                                                <div className="text-sm text-purple-300">{lang === 'ur' ? 'ڈرماٹولوجی • کل 10:00 بجے' : 'Dermatology • Tomorrow 10:00 AM'}</div>
+                                                <div className="font-black text-white text-lg tracking-tight">{lang === 'ur' ? 'ڈاکٹر فیصل قریشی' : 'Dr. Faisal Qureshi'}</div>
+                                                <div className="text-[10px] text-blue-400 font-black uppercase tracking-widest">{lang === 'ur' ? 'ڈرماٹولوجی • کل' : 'Dermatology • Tomorrow'}</div>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Abstract Floating Element */}
-                                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/30 blur-2xl lg:blur-3xl rounded-full translate-z-10 pointer-events-none"></div>
+                                    <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-500/10 blur-[100px] rounded-full translate-z-10 pointer-events-none"></div>
                                 </div>
                             </TiltCard>
                         </motion.div>
@@ -510,7 +529,7 @@ export default function Page() {
                         </p>
                     </motion.div>
 
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid md:grid-cols-3 gap-10">
                         {features.map((feature, index) => (
                             <motion.div
                                 key={index}
@@ -518,12 +537,15 @@ export default function Page() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true, margin: "-100px" }}
                                 transition={{ duration: 0.6, delay: index * 0.2 }}
+                                className="h-full"
                             >
-                                <TiltCard>
-                                    <div className={`p-8 bg-black/40 backdrop-blur-md lg:backdrop-blur-xl rounded-3xl border border-white/10 hover:border-cyan-500/50 hover:bg-white/10 transition-all duration-300 h-full flex flex-col translate-z-10 preserve-3d shadow-2xl ${lang === 'ur' ? 'items-end text-right' : 'items-start text-left'}`}>
-                                        <div className="text-4xl md:text-5xl mb-6 translate-z-30 drop-shadow-lg">{feature.icon}</div>
-                                        <h3 className="text-xl md:text-2xl font-bold text-white mb-3 translate-z-20">{feature.title}</h3>
-                                        <p className="text-gray-400 leading-relaxed translate-z-10">{feature.description}</p>
+                                <TiltCard className="h-full">
+                                    <div className={`p-10 glass-card rounded-[3rem] group transition-all hover:bg-white/[0.05] h-full flex flex-col translate-z-10 preserve-3d ${lang === 'ur' ? 'items-end text-right' : 'items-start text-left'}`}>
+                                        <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center text-4xl mb-8 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-xl shadow-blue-500/10">
+                                            {feature.icon}
+                                        </div>
+                                        <h3 className="text-2xl font-black text-white mb-4 tracking-tight translate-z-20">{feature.title}</h3>
+                                        <p className="text-slate-400 leading-relaxed font-medium text-sm translate-z-10 opacity-80">{feature.description}</p>
                                     </div>
                                 </TiltCard>
                             </motion.div>
@@ -568,14 +590,14 @@ export default function Page() {
             </section>
 
             {/* Contact Section */}
-            <section id="contact" className="py-24 relative z-10">
-                <div className="max-w-4xl mx-auto px-6 lg:px-8">
+            <section id="contact" className="py-32 relative z-10 px-6">
+                <div className="max-w-4xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8 }}
-                        className="bg-black/40 backdrop-blur-lg lg:backdrop-blur-2xl rounded-[2.5rem] border border-white/10 p-8 md:p-16 shadow-2xl relative overflow-hidden"
+                        className="glass-card rounded-[4rem] p-10 md:p-20 shadow-2xl relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-2xl lg:blur-[100px] pointer-events-none" />
                         <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-600/10 blur-2xl lg:blur-[100px] pointer-events-none" />

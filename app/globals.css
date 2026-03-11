@@ -4,51 +4,53 @@
 
 @layer base {
   :root {
-    /* Premium dark mode palette */
-    --background: 222.2 84% 4.9%; /* Deep premium blue-black */
-    --foreground: 210 40% 98%;    /* Off white */
-    
-    --card: 224 71% 4%;
+    /* Night/Default Theme (Standard Premium Medical look) */
+    --background: 226 80% 4%;
+    --foreground: 210 40% 98%;
+    --card: 226 80% 6%;
     --card-foreground: 210 40% 98%;
-    
-    --popover: 224 71% 4%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
-
-    --radius: 0.75rem;
-
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 226 30% 12%;
+    --muted: 226 30% 12%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 91% 60%;
+    --border: 226 30% 15%;
+    --input: 226 30% 15%;
+    --ring: 217 91% 60%;
+    --radius: 1.5rem;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.05);
   }
-}
 
-@layer base {
+  .day {
+    /* Day Theme (Bright Crystal Medical look) */
+    --background: 210 40% 98%;
+    --foreground: 226 80% 4%;
+    --card: 210 40% 100%;
+    --card-foreground: 226 80% 10%;
+    --primary: 217 91% 55%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 94%;
+    --muted: 210 20% 90%;
+    --muted-foreground: 215 25% 40%;
+    --accent: 217 91% 55%;
+    --border: 217 30% 90%;
+    --input: 217 30% 95%;
+    --ring: 217 91% 55%;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(37, 99, 235, 0.1);
+  }
+
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
+    transition: background-color 0.8s ease, color 0.5s ease, border-color 0.8s ease, box-shadow 0.8s ease;
   }
+
   body {
-    @apply bg-background text-foreground antialiased selection:bg-primary/30;
+    background-color: transparent;
+    color: hsl(var(--foreground));
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
@@ -57,49 +59,88 @@
     text-wrap: balance;
   }
   
-  /* 3D Transform Utilities for Mouse Parallax */
-  .preserve-3d {
-    transform-style: preserve-3d;
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
   }
-  .perspective-1000 {
-    perspective: 1000px;
+
+  .glow-blue {
+    box-shadow: 0 0 20px -5px rgba(37, 99, 235, 0.4);
   }
-  .translate-z-10 {
-    transform: translateZ(10px);
+
+  .premium-gradient {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.02) 100%);
   }
-  .translate-z-20 {
-    transform: translateZ(20px);
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
-  .translate-z-30 {
-    transform: translateZ(30px);
-  }
-  .translate-z-40 {
-    transform: translateZ(40px);
-  }
-  .translate-z-50 {
-    transform: translateZ(50px);
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 }
 
-/* Custom premium background mesh using soft radial blurs */
+/* 10/10 Animated Background Mesh */
 .bg-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
   background-color: hsl(var(--background));
-  background-image: 
-    radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-    radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-  position: relative;
-  z-index: 0;
+  overflow: hidden;
 }
 
+.bg-mesh::before,
 .bg-mesh::after {
   content: "";
   position: absolute;
-  inset: 0;
+  width: 140%;
+  height: 140%;
+  top: -20%;
+  left: -20%;
   z-index: -1;
-  background-image: 
-    radial-gradient(at 40% 20%, hsla(228,100%,74%,0.15) 0px, transparent 60%),
-    radial-gradient(at 80% 0%, hsla(189,100%,56%,0.2) 0px, transparent 60%),
-    radial-gradient(at 0% 50%, hsla(355,100%,93%,0.1) 0px, transparent 60%);
+  pointer-events: none;
+  filter: blur(80px);
+  opacity: 0.6;
+}
+
+.bg-mesh::before {
+  background: radial-gradient(circle at 20% 30%, hsla(var(--primary) / 0.15) 0%, transparent 40%),
+              radial-gradient(circle at 80% 70%, hsla(var(--primary) / 0.1) 0%, transparent 40%);
+  animation: mesh-move-1 25s infinite alternate ease-in-out;
+}
+
+.bg-mesh::after {
+  background: radial-gradient(circle at 70% 20%, hsla(var(--primary) / 0.08) 0%, transparent 40%),
+              radial-gradient(circle at 30% 80%, hsla(var(--primary) / 0.1) 0%, transparent 40%);
+  animation: mesh-move-2 30s infinite alternate-reverse ease-in-out;
+}
+
+.day .bg-mesh::before,
+.day .bg-mesh::after {
+  opacity: 0.3;
+  filter: blur(120px);
+}
+
+@keyframes mesh-move-1 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  100% { transform: translate(5%, 10%) scale(1.1) rotate(5deg); }
+}
+
+@keyframes mesh-move-2 {
+  0% { transform: translate(0, 0) scale(1.1) rotate(0deg); }
+  100% { transform: translate(-5%, -10%) scale(1) rotate(-5deg); }
+}
+
+/* Subtle grain texture overlay for premium feel */
+.bg-mesh-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -5;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
   pointer-events: none;
 }

@@ -16,7 +16,7 @@ export default async function AdminLayout({
   if (role !== 'ADMIN') redirect(role === 'DOCTOR' ? '/dashboard/doctor' : '/dashboard/patient');
 
   return (
-    <div className="min-h-screen bg-mesh text-white">
+    <div className="min-h-screen  text-white">
       {/* Navigation Overlay */}
       <nav className="sticky top-0 z-50 bg-black/40 backdrop-blur-xl border-b border-white/10 px-6 py-4 shadow-2xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -30,7 +30,7 @@ export default async function AdminLayout({
               </span>
             </Link>
 
-            <div className="hidden lg:flex items-center gap-6">
+            <div className="hidden lg:flex items-center gap-10 xl:gap-14 ml-8">
               {[
                 { name: 'Overview', href: '/dashboard/admin', icon: LayoutDashboard },
                 { name: 'Users', href: '/dashboard/admin/users', icon: UserCog },
@@ -40,7 +40,7 @@ export default async function AdminLayout({
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-cyan-400 transition-colors py-2"
+                  className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-cyan-400 transition-colors py-2"
                 >
                   <item.icon className="w-4 h-4" />
                   {item.name}

@@ -24,7 +24,7 @@ export default async function DoctorLayout({
   const isApproved = profile?.approved;
 
   return (
-    <div className="min-h-screen bg-mesh text-gray-100 font-sans">
+    <div className="min-h-screen  text-gray-100 font-sans">
       <nav className="backdrop-blur-xl bg-black/20 border-b border-white/5 px-6 py-4 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-8">
@@ -38,17 +38,17 @@ export default async function DoctorLayout({
             </Link>
 
             {isApproved && (
-              <div className="hidden md:flex items-center gap-6">
-                <Link href="/dashboard/doctor" className="text-sm font-medium text-gray-300 hover:text-cyan-400 transition-colors">
+              <div className="hidden lg:flex items-center gap-10 xl:gap-14 ml-8">
+                <Link href="/dashboard/doctor" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-cyan-400 transition-colors">
                   Dashboard
                 </Link>
-                <Link href="/dashboard/doctor/profile" className="text-sm font-medium text-gray-300 hover:text-cyan-400 transition-colors">
+                <Link href="/dashboard/doctor/profile" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-cyan-400 transition-colors">
                   Profile
                 </Link>
-                <Link href="/dashboard/doctor/availability" className="text-sm font-medium text-gray-300 hover:text-cyan-400 transition-colors">
+                <Link href="/dashboard/doctor/availability" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-cyan-400 transition-colors">
                   Availability
                 </Link>
-                <Link href="/dashboard/doctor/appointments" className="text-sm font-medium text-gray-300 hover:text-cyan-400 transition-colors">
+                <Link href="/dashboard/doctor/appointments" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-cyan-400 transition-colors">
                   Appointments
                 </Link>
               </div>

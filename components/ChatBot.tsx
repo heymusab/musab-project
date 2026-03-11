@@ -30,6 +30,12 @@ export function ChatBot() {
     if (open) inputRef.current?.focus();
   }, [open]);
 
+  useEffect(() => {
+    const handleOpenChat = () => setOpen(true);
+    window.addEventListener('open-chat', handleOpenChat);
+    return () => window.removeEventListener('open-chat', handleOpenChat);
+  }, []);
+
   const sendMessage = async () => {
     const text = input.trim();
     if (!text || loading) return;
@@ -84,99 +90,102 @@ export function ChatBot() {
       e.preventDefault();
       sendMessage();
     }
-  };
-
-  return (
+  };    return (
     <>
       {/* Floating button */}
-      <button
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? 'Close chat' : 'Open chat'}
-        className="fixed bottom-6 right-6 z-[100] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/30 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-blue-500/40 focus:outline-none focus:ring-4 focus:ring-blue-400/50"
+        className="fixed bottom-6 right-6 z-[100] flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-2xl shadow-blue-500/30 transition-all duration-300 hover:shadow-blue-500/50 focus:outline-none ring-offset-2 ring-offset-slate-950 focus:ring-2 focus:ring-blue-500"
       >
         {open ? (
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         ) : (
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
+          <div className="relative">
+            <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+            </span>
+          </div>
         )}
-      </button>
+      </motion.button>
 
       {/* Chat modal */}
       <AnimatePresence>
         {open && (
-          <div className="fixed inset-0 z-[120] flex items-end justify-end p-4 pb-24 sm:p-6 sm:pb-28 pointer-events-none">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setOpen(false)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto"
-            />
-
+          <div className="fixed bottom-24 right-6 z-[120] w-[calc(100%-3rem)] max-w-sm pointer-events-none">
             {/* Card */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20, filter: 'blur(10px)' }}
-              animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, scale: 0.9, y: 20, filter: 'blur(10px)' }}
-              className="relative flex h-[min(85vh,550px)] w-full max-w-sm flex-col overflow-hidden rounded-[32px] border border-white/10 bg-black/40 backdrop-blur-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto"
+              initial={{ opacity: 0, scale: 0.95, y: 20, transformOrigin: 'bottom right' }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative flex h-[min(70vh,550px)] w-full flex-col overflow-hidden rounded-[2.5rem] border border-border glass-card shadow-[0_25px_50px_-12px_rgba(0,0,0,0.3)] pointer-events-auto"
             >
               {/* Header */}
-              <div className="flex shrink-0 items-center gap-4 border-b border-white/5 bg-white/5 px-6 py-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 text-white shadow-lg">
-                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-                <div>
-                  <h2 className="font-bold text-white tracking-tight">AI Assistant</h2>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                    <p className="text-[10px] text-cyan-400 font-black uppercase tracking-widest">Always Online</p>
+              <div className="flex shrink-0 items-center justify-between border-b border-border bg-card/40 px-8 py-6">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-primary to-blue-600 text-white shadow-lg shadow-primary/20 shrink-0">
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <h2 className="font-black text-foreground tracking-tighter leading-tight">MediAI Assistant</h2>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                      <p className="text-[10px] text-primary font-bold uppercase tracking-widest leading-none">Live Now</p>
+                    </div>
                   </div>
                 </div>
+                <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-none">
+              <div className="flex-1 overflow-y-auto p-6 space-y-5 scrollbar-none">
                 {messages.length === 0 && (
-                  <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 px-4">
-                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-2xl mb-4 border border-white/5">👋</div>
-                    <p className="text-white font-bold mb-1">Hello! How can I help?</p>
-                    <p className="text-xs leading-relaxed">Describe your symptoms and I&apos;ll point you to the right specialist.</p>
+                  <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                    <div className="w-16 h-16 rounded-[2rem] bg-primary/10 flex items-center justify-center text-3xl mb-6 border border-primary/20 animate-bounce">🤖</div>
+                    <p className="text-foreground font-black text-xl tracking-tight mb-2">Hello! How can I help?</p>
+                    <p className="text-sm text-muted-foreground font-medium">I can help find specialists, check symptoms or guide you through appointments.</p>
                   </div>
                 )}
                 {messages.map((msg) => (
                   <motion.div
                     key={msg.id}
-                    initial={{ opacity: 0, x: msg.role === 'user' ? 10 : -10 }}
-                    animate={{ opacity: 1, x: 0 }}
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
                     className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[90%] rounded-2xl px-4 py-3 text-sm shadow-lg ${msg.role === 'user'
-                          ? 'bg-gradient-to-r from-cyan-600 to-blue-700 text-white rounded-br-none border border-white/10'
-                          : 'bg-white/5 text-gray-100 rounded-bl-none border border-white/10 backdrop-blur-md'
+                      className={`max-w-[85%] rounded-[1.5rem] px-5 py-4 text-sm shadow-xl ${msg.role === 'user'
+                          ? 'bg-primary text-white rounded-tr-none shadow-primary/20'
+                          : 'bg-muted/80 text-foreground rounded-tl-none border border-border shadow-black/5'
                         }`}
                     >
-                      <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
+                      <p className="whitespace-pre-wrap break-words leading-relaxed font-medium">{msg.content}</p>
                     </div>
                   </motion.div>
                 ))}
                 {loading && (
                   <div className="flex justify-start">
-                    <div className="max-w-[85%] rounded-2xl rounded-bl-none border border-white/10 bg-white/5 px-4 py-3 text-sm text-cyan-400 flex items-center gap-2">
-                      <span className="flex gap-1">
-                        <span className="w-1 h-1 bg-cyan-400 rounded-full animate-bounce"></span>
-                        <span className="w-1 h-1 bg-cyan-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                        <span className="w-1 h-1 bg-cyan-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                    <div className="max-w-[85%] rounded-[1.5rem] rounded-tl-none border border-border bg-muted/80 px-5 py-4 text-sm text-primary flex items-center gap-3">
+                      <span className="flex gap-1.5">
+                        <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-duration:1s]"></span>
+                        <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.2s] [animation-duration:1s]"></span>
+                        <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.4s] [animation-duration:1s]"></span>
                       </span>
-                      Thinking...
                     </div>
                   </div>
                 )}
@@ -184,28 +193,29 @@ export function ChatBot() {
               </div>
 
               {/* Input */}
-              <div className="shrink-0 border-t border-white/5 bg-white/5 p-4">
-                <div className="flex gap-2 relative z-10">
+              <div className="shrink-0 p-6 bg-card/40 backdrop-blur-md">
+                <div className="flex gap-3 items-center">
                   <textarea
                     ref={inputRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type your symptoms..."
+                    placeholder="Ask anything..."
                     rows={1}
                     disabled={loading}
-                    className="min-h-[48px] w-full resize-none rounded-[18px] border border-white/10 bg-black/40 px-5 py-3 text-sm text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-60 transition-all"
+                    className="min-h-[56px] py-[18px] w-full resize-none rounded-[1.5rem] border border-border bg-muted/50 px-6 text-sm text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:opacity-60 transition-all scrollbar-none self-center"
                   />
-                  <button
+                  <motion.button
+                    whileTap={{ scale: 0.9 }}
                     type="button"
                     onClick={sendMessage}
                     disabled={loading || !input.trim()}
-                    className="shrink-0 rounded-[18px] bg-gradient-to-r from-cyan-500 to-blue-600 px-5 text-white shadow-lg transition-all active:scale-90 disabled:opacity-50 flex items-center justify-center border border-white/10"
+                    className="shrink-0 h-14 w-14 rounded-2xl bg-primary text-white shadow-lg shadow-primary/20 transition-all disabled:opacity-50 flex items-center justify-center border border-white/10"
                   >
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             </motion.div>

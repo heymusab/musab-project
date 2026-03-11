@@ -1,163 +1,145 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Activity, Brain, Heart, Info, Send, AlertCircle, RefreshCcw } from 'lucide-react';
+import BodyMap from '@/components/BodyMap';
 
-type Message = {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
+type BodyPart = 'head' | 'chest' | 'stomach' | 'arms' | 'legs';
+
+const partDetails = {
+  head: { title: 'Head & Brain Symptoms', color: 'blue', questions: ['Severe headache?', 'Dizziness?', 'Vision blur?'] },
+  chest: { title: 'Chest & Heart Symptoms', color: 'cyan', questions: ['Shortness of breath?', 'Chest tight?', 'High heart rate?'] },
+  stomach: { title: 'Abdominal Symptoms', color: 'indigo', questions: ['Stomach pain?', 'Nausea?', 'Bloating?'] },
+  arms: { title: 'Upper Extremities', color: 'purple', questions: ['Joint pain?', 'Numbness?', 'Swelling?'] },
+  legs: { title: 'Lower Extremities', color: 'violet', questions: ['Leg cramps?', 'Walking difficulty?', 'Varicose veins?'] },
 };
 
 export default function SymptomCheckerPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [selectedPart, setSelectedPart] = useState<BodyPart | null>(null);
+  const [step, setStep] = useState(0);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, loading]);
-
-  const sendMessage = async () => {
-    const text = input.trim();
-    if (!text || loading) return;
-
-    const userMsg: Message = { id: crypto.randomUUID(), role: 'user', content: text };
-    setMessages((prev) => [...prev, userMsg]);
-    setInput('');
-    setLoading(true);
-
-    try {
-      const history = messages.map((m) => ({ role: m.role, content: m.content }));
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, history }),
-      });
-      const data = (await res.json()) as { reply?: string; error?: string };
-      const content =
-        res.ok && data.reply
-          ? data.reply
-          : data.reply || data.error || 'Sorry, I couldn’t process that. Please try again.';
-
-      const assistantMsg: Message = { id: crypto.randomUUID(), role: 'assistant', content };
-      setMessages((prev) => [...prev, assistantMsg]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { id: crypto.randomUUID(), role: 'assistant', content: 'Something went wrong. Please try again.' },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+  const handlePartClick = (part: BodyPart) => {
+    setSelectedPart(part);
+    setStep(1);
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="mx-auto max-w-3xl"
-    >
-      <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">AI Symptom Checker</h1>
-          <p className="text-gray-400">
-            Describe your symptoms naturally and get personalized specialist suggestions.
-          </p>
-        </div>
-        <Link
-          href="/dashboard/patient"
-          className="shrink-0 rounded-2xl border border-cyan-500/30 bg-white/5 px-6 py-3 text-sm font-bold text-cyan-400 hover:bg-cyan-500 hover:text-white transition-all shadow-[0_0_15px_rgba(6,182,212,0.1)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
-        >
-          Find specialists →
-        </Link>
-      </div>
+    <div className="h-full">
+      <div className="flex flex-col md:flex-row gap-12 items-start h-full">
+        {/* Left Side: Instructions & Body Map */}
+        <div className="w-full lg:w-1/2 space-y-8 sticky top-24">
+          <div>
+            <h1 className="text-4xl font-black text-foreground tracking-tighter">AI Symptom Checker</h1>
+            <p className="text-muted-foreground font-medium mt-1">Select a body part to begin an interactive diagnostic session</p>
+          </div>
 
-      <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl relative">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
-        {/* Messages */}
-        <div className="flex h-[500px] flex-col overflow-y-auto p-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10">
-          {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 max-w-md mx-auto">
-              <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center text-3xl mb-6 border border-white/5">💬</div>
-              <p className="text-white font-semibold mb-2">Ready to assist you</p>
-              <p className="text-sm">Describe your symptoms (e.g., &quot;I have a sharp pain in my lower back&quot;) and I&apos;ll suggest the right specialist.</p>
-              <p className="mt-4 text-[10px] uppercase tracking-widest bg-white/5 px-3 py-1 rounded-full border border-white/5">Educational use only</p>
+          <div className="glass-card rounded-[3rem] p-10 border border-border relative group">
+            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+            <BodyMap onPartClick={handlePartClick} />
+            <div className="mt-8 flex items-center justify-center gap-6 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+              <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-primary"></span> Selectable</span>
+              <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-muted"></span> Hover to Focus</span>
             </div>
-          )}
-          {messages.map((msg) => (
-            <motion.div
-              key={msg.id}
-              initial={{ opacity: 0, x: msg.role === 'user' ? 20 : -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[85%] rounded-2xl px-5 py-3.5 text-sm shadow-lg ${msg.role === 'user'
-                  ? 'rounded-br-none bg-gradient-to-r from-cyan-600 to-blue-700 text-white border border-white/10 shadow-cyan-500/10'
-                  : 'rounded-bl-none border border-white/10 bg-white/5 text-gray-100 backdrop-blur-md'
-                  }`}
-              >
-                <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
-              </div>
-            </motion.div>
-          ))}
-          {loading && (
-            <div className="flex justify-start">
-              <div className="rounded-2xl rounded-bl-none border border-white/10 bg-white/5 px-5 py-3.5 text-sm text-cyan-400 flex items-center gap-3">
-                <div className="flex gap-1">
-                  <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce"></span>
-                  <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                  <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                </div>
-                AI is analyzing...
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input */}
-        <div className="border-t border-white/10 bg-white/5 p-4">
-          <div className="flex gap-3 relative z-10">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="e.g. fever and cough, chest pain..."
-              rows={1}
-              disabled={loading}
-              className="min-h-[50px] w-full resize-none rounded-2xl border border-white/10 bg-black/40 px-5 py-3.5 text-sm text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 disabled:opacity-60 transition-all font-medium"
-            />
-            <button
-              type="button"
-              onClick={sendMessage}
-              disabled={loading || !input.trim()}
-              className="shrink-0 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 text-white shadow-lg hover:shadow-cyan-500/30 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center border border-white/10"
-            >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </button>
           </div>
         </div>
+
+        {/* Right Side: AI Diagnostic Panel */}
+        <div className="w-full lg:w-1/2 flex flex-col gap-8">
+          <AnimatePresence mode="wait">
+            {!selectedPart ? (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="h-full flex flex-col items-center justify-center text-center p-12 glass-card rounded-[3rem] border-dashed border-border"
+              >
+                <div className="w-20 h-20 rounded-[2.5rem] bg-muted/20 flex items-center justify-center text-4xl mb-8 animate-pulse">🤖</div>
+                <h3 className="text-2xl font-black text-foreground tracking-tight mb-4">Awaiting Selection</h3>
+                <p className="text-muted-foreground font-medium max-w-xs mx-auto">Click on any body part in the 3D map to start the MediAI diagnostic process.</p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="diagnostic"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="glass-card rounded-[3rem] p-10 flex flex-col min-h-[500px] border border-primary/20 shadow-2xl shadow-primary/5"
+              >
+                {/* Panel Header */}
+                <div className="flex items-center justify-between mb-10 pb-6 border-b border-border">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                      <Activity size={24} />
+                    </div>
+                    <div>
+                      <h2 className="font-black text-foreground tracking-tighter uppercase">{partDetails[selectedPart].title}</h2>
+                      <p className="text-[10px] text-primary font-bold tracking-widest uppercase">MediAI Scan Active</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedPart(null)}
+                    className="p-3 rounded-xl hover:bg-muted/50 transition-colors text-muted-foreground"
+                  >
+                    <RefreshCcw size={18} />
+                  </button>
+                </div>
+
+                {/* AI Chat-like Interface for Diagnostic Questions */}
+                <div className="flex-1 space-y-6 overflow-y-auto mb-10 scrollbar-none pr-4">
+                  <div className="flex justify-start">
+                    <div className="bg-muted/50 text-foreground px-6 py-4 rounded-[1.5rem] rounded-tl-none border border-border text-sm font-medium">
+                      I see you&apos;re experiencing issues with your {selectedPart}. Let&apos;s evaluate. Are you feeling any of these?
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    {partDetails[selectedPart].questions.map((q, i) => (
+                      <motion.button
+                        key={i}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        className="w-full text-left p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/50 hover:bg-primary/5 transition-all group"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-bold text-muted-foreground group-hover:text-foreground transition-colors">{q}</span>
+                          <div className="w-6 h-6 rounded-lg border border-border group-hover:bg-primary group-hover:border-primary transition-all flex items-center justify-center">
+                            <CheckCircle2 size={12} className="text-white opacity-0 group-hover:opacity-100" />
+                          </div>
+                        </div>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Info Card */}
+                <div className="bg-primary/10 border border-primary/20 p-6 rounded-2xl flex gap-4">
+                  <AlertCircle className="text-primary shrink-0" size={20} />
+                  <p className="text-xs text-primary font-bold leading-relaxed">
+                    Note: This is an AI-assisted evaluation. For emergency cases, please call the hospital instantly via the &quot;Book Consultation&quot; button.
+                  </p>
+                </div>
+
+                <div className="mt-8 flex gap-3">
+                  <button className="flex-1 py-5 bg-primary text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    Generate Diagnosis
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
+}
+
+function CheckCircle2({ size, className }: { size: number, className: string }) {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+            <path d="M20 6 9 17l-5-5"/>
+        </svg>
+    );
 }

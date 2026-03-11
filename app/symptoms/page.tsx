@@ -29,7 +29,7 @@ export default function PublicSymptomCheckerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-mesh flex items-center justify-center p-4 overflow-hidden relative">
+    <div className="min-h-screen  flex items-center justify-center p-4 overflow-hidden relative">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/10 blur-[120px] rounded-full -mr-64 -mt-64"></div>
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/10 blur-[120px] rounded-full -ml-64 -mb-64"></div>
 

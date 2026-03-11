@@ -4,6 +4,11 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { DayPicker } from 'react-day-picker';
+import { format, isBefore, startOfToday } from 'date-fns';
+import { Calendar } from 'lucide-react';
+import 'react-day-picker/dist/style.css';
+import { toast } from 'sonner';
 
 type DoctorDetail = {
   id: string;
@@ -26,7 +31,7 @@ export default function DoctorProfilePage() {
   const id = params.id as string;
   const [doctor, setDoctor] = useState<DoctorDetail | null>(null);
   const [slots, setSlots] = useState<string[]>([]);
-  const [date, setDate] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [time, setTime] = useState('');
   const [booking, setBooking] = useState(false);
 
@@ -37,155 +42,210 @@ export default function DoctorProfilePage() {
   }, [id]);
 
   useEffect(() => {
-    if (!date) { setSlots([]); return; }
-    fetch(`/api/doctors/${id}/slots?date=${date}`)
+    if (!selectedDate) { setSlots([]); return; }
+    const dateStr = format(selectedDate, 'yyyy-MM-dd');
+    fetch(`/api/doctors/${id}/slots?date=${dateStr}`)
       .then((res) => res.json())
       .then((data) => setSlots(data.slots || []));
-  }, [id, date]);
+  }, [id, selectedDate]);
 
   const handleBook = async () => {
-    if (!date || !time) return;
+    if (!selectedDate || !time) return;
+    const dateStr = format(selectedDate, 'yyyy-MM-dd');
     setBooking(true);
+    const promise = fetch('/api/appointments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ doctorId: id, date: dateStr, time }),
+    }).then(async (res) => {
+        if (!res.ok) throw new Error((await res.json()).error || 'Booking failed');
+        router.push('/dashboard/patient/appointments');
+        return res;
+    });
+
+    toast.promise(promise, {
+        loading: 'Confirming your appointment...',
+        success: 'Appointment booked successfully! ✨',
+        error: (err) => err.message,
+    });
+
     try {
-      const res = await fetch('/api/appointments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ doctorId: id, date, time }),
-      });
-      if (res.ok) router.push('/dashboard/patient/appointments');
-      else alert((await res.json()).error || 'Booking failed');
+        await promise;
     } finally {
-      setBooking(false);
+        setBooking(false);
     }
   };
 
-  if (!doctor) return <p className="text-gray-500">Loading...</p>;
-
-  const minDate = new Date().toISOString().slice(0, 10);
+  if (!doctor) return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-slate-500 font-black uppercase tracking-widest text-xs">Fetching Profile...</p>
+    </div>
+  );
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="max-w-4xl"
+      className="max-w-5xl space-y-8"
     >
-      <Link href="/dashboard/patient" className="text-cyan-400 font-medium hover:text-cyan-300 transition-colors mb-6 flex items-center gap-2 w-fit">
-        <span className="text-lg">←</span> Back to specialist directory
+      <Link href="/dashboard/patient" className="text-slate-500 font-black text-xs uppercase tracking-widest hover:text-blue-500 transition-colors mb-6 flex items-center gap-3 w-fit group">
+        <span className="text-lg group-hover:-translate-x-1 transition-transform">←</span> Return to specialists
       </Link>
 
-      <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8 mb-8 shadow-[0_15px_40px_rgba(0,0,0,0.5)] relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 blur-3xl rounded-full"></div>
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-8 relative z-10">
-          <div className="w-24 h-24 shrink-0 rounded-2xl bg-gradient-to-tr from-cyan-400 to-blue-600 flex items-center justify-center text-white text-3xl font-bold shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+      <div className="bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/5 blur-[120px] rounded-full pointer-events-none"></div>
+        <div className="flex flex-col md:flex-row items-center md:items-center gap-10 relative z-10">
+          <div className="w-32 h-32 shrink-0 rounded-[2rem] bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white text-5xl font-black shadow-2xl shadow-blue-500/20 rotate-3 group-hover:rotate-0 transition-transform">
             {doctor.user.name.charAt(0)}
           </div>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-white mb-1 tracking-tight">{doctor.user.name}</h1>
-            <p className="text-cyan-400 font-semibold mb-3">{doctor.specialization}</p>
-            <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-gray-300">
-              <span className="flex items-center gap-1 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
-                <span className="text-cyan-400">🏅</span> {doctor.experience} yrs exp
+          <div className="flex-1 text-center md:text-left">
+            <h1 className="text-4xl font-black text-white mb-2 tracking-tighter">{doctor.user.name}</h1>
+            <p className="text-sm text-blue-500 font-black uppercase tracking-[0.2em] mb-6">{doctor.specialization}</p>
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+              <span className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/5 text-xs font-bold text-slate-300">
+                <span className="text-blue-500">🏅</span> {doctor.experience}Y EXPERIENCE
               </span>
-              <span className="flex items-center gap-1 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
-                <span className="text-green-400">💲</span> ${doctor.fee} consultation
+              <span className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/5 text-xs font-bold text-slate-300">
+                <span className="text-blue-500">⭐️</span> {doctor.rating} ({doctor.reviewCount} REVIEWS)
               </span>
-              <span className="flex items-center gap-1 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
-                <span className="text-yellow-400">⭐</span> {doctor.rating} ({doctor.reviewCount} reviews)
+              <span className="flex items-center gap-2 bg-blue-500/10 px-4 py-2 rounded-xl border border-blue-500/10 text-xs font-bold text-blue-400">
+                <span className="text-blue-500">Verified</span> 
               </span>
             </div>
 
             {doctor.bio && (
-              <div className="mt-6 pt-6 border-t border-white/10">
-                <h3 className="text-white font-semibold mb-2">About Doctor</h3>
-                <p className="text-gray-400 leading-relaxed text-sm">{doctor.bio}</p>
+              <div className="mt-8 pt-8 border-t border-white/5">
+                <p className="text-slate-400 leading-loose text-sm font-medium italic opacity-80">&quot;{doctor.bio}&quot;</p>
               </div>
             )}
+          </div>
+        </div>
+      </div>
 
-            <div className="mt-6">
-              <h3 className="text-white font-semibold mb-2 flex items-center gap-2">
-                <span className="text-cyan-400">📅</span> Weekly Schedule
-              </h3>
-              <div className="flex flex-wrap gap-2 text-sm text-gray-300">
-                {doctor.availability.length ? doctor.availability.map((a, i) => (
-                  <span key={i} className="bg-white/5 px-3 py-1 rounded-md border border-white/5">
-                    <span className="font-semibold text-white">{DAYS[a.dayOfWeek]}</span> {a.startTime}-{a.endTime}
-                  </span>
-                )) : <span className="text-gray-500 italic">No schedule posted</span>}
+      <div className="grid lg:grid-cols-5 gap-8">
+        <div className="lg:col-span-3 bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-10 shadow-2xl">
+          <h2 className="text-2xl font-black text-white mb-8 flex items-center gap-3 tracking-tighter uppercase">
+            <span className="bg-blue-600/20 p-2.5 rounded-xl text-blue-400">📅</span> Smart Booking
+          </h2>
+          
+          <div className="flex flex-col md:flex-row gap-10">
+            <div className="flex-1 bg-white/5 p-6 rounded-3xl border border-white/5">
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 ml-1">Select Date</label>
+                <DayPicker
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(d) => {setSelectedDate(d); setTime('');}}
+                    disabled={{ before: startOfToday() }}
+                    className="rdp-custom"
+                />
+            </div>
+
+            <div className="flex-1 space-y-6">
+              <div>
+                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Select Time Slot</label>
+                <div className="grid grid-cols-2 gap-3 min-h-[200px] content-start">
+                    {slots.length ? slots.map((s) => (
+                        <button
+                            key={s}
+                            onClick={() => setTime(s)}
+                            className={`px-4 py-3 rounded-xl text-xs font-black tracking-widest uppercase transition-all border ${
+                                time === s 
+                                ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20' 
+                                : 'bg-white/5 border-white/5 text-slate-400 hover:border-blue-500/50 hover:text-white'
+                            }`}
+                        >
+                            {s}
+                        </button>
+                    )) : (
+                        <div className="col-span-2 flex flex-col items-center justify-center py-10 opacity-30">
+                            <Calendar className="w-10 h-10 mb-2" />
+                            <p className="text-[10px] font-black">PICK A DATE FIRST</p>
+                        </div>
+                    )}
+                </div>
               </div>
+
+              <button
+                onClick={handleBook}
+                disabled={!selectedDate || !time || booking}
+                className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.2em] text-xs rounded-2xl shadow-2xl shadow-blue-600/30 transition-all hover:-translate-y-1 active:scale-95 disabled:opacity-30"
+              >
+                Confirm Appointment
+              </button>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="bg-gradient-to-br from-blue-900/20 to-black/40 backdrop-blur-xl border border-cyan-500/20 rounded-3xl p-8 mb-8 shadow-[0_0_30px_rgba(6,182,212,0.1)]">
-        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <span className="bg-cyan-500/20 p-2 rounded-lg text-cyan-400 mr-2">🗓️</span> Book an Appointment
-        </h2>
+        <div className="lg:col-span-2 space-y-8">
+            <div className="bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 shadow-2xl">
+                <h3 className="text-lg font-black text-white mb-6 uppercase tracking-tighter">Availability Info</h3>
+                <div className="space-y-3">
+                    {doctor.availability.length ? doctor.availability.map((a, i) => (
+                    <div key={i} className="flex justify-between items-center bg-white/5 px-5 py-3 rounded-xl border border-white/5 group hover:border-blue-500/30 transition-colors">
+                        <span className="font-bold text-slate-100 text-sm">{DAYS[a.dayOfWeek]}</span>
+                        <span className="text-blue-400 font-black text-[10px] uppercase tracking-widest">{a.startTime} — {a.endTime}</span>
+                    </div>
+                    )) : <p className="text-slate-500 italic text-sm text-center">No recurring schedule posted</p>}
+                </div>
+            </div>
 
-        <div className="flex flex-col md:flex-row gap-6 relative z-10">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-300 mb-2">Select Date</label>
-            <input
-              type="date"
-              value={date}
-              min={minDate}
-              onChange={(e) => { setDate(e.target.value); setTime(''); }}
-              className="w-full px-5 py-3 bg-black/40 border border-white/10 text-white focus:ring-2 focus:ring-cyan-500 rounded-xl outline-none"
-              style={{ colorScheme: 'dark' }}
-            />
-          </div>
-
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-gray-300 mb-2">Select Time</label>
-            <select
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              disabled={!slots.length}
-              className="w-full px-5 py-3 bg-black/40 border border-white/10 text-white focus:ring-2 focus:ring-cyan-500 rounded-xl outline-none disabled:opacity-50 appearance-none"
-            >
-              <option value="" className="bg-gray-900">{slots.length ? 'Available times...' : 'Pick a valid date first'}</option>
-              {slots.map((s) => (
-                <option key={s} value={s} className="bg-gray-900">{s}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-end">
-            <button
-              onClick={handleBook}
-              disabled={!date || !time || booking}
-              className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] disabled:opacity-50 transition-all hover:-translate-y-0.5"
-            >
-              {booking ? 'Confirming...' : 'Confirm Booking'}
-            </button>
-          </div>
+            <div className="bg-slate-900/40 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-8 shadow-2xl h-full flex-1">
+                <h3 className="text-lg font-black text-white mb-6 uppercase tracking-tighter flex justify-between items-center">
+                    <span>Reviews</span>
+                    <span className="text-blue-400 text-sm">{doctor.reviewCount}</span>
+                </h3>
+                {doctor.reviews.length === 0 ? (
+                    <p className="text-slate-600 text-sm italic py-4">No reviews yet.</p>
+                ) : (
+                    <div className="space-y-4">
+                        {doctor.reviews.slice(0, 3).map((r, i) => (
+                            <div key={i} className="bg-white/5 rounded-2xl p-5 border border-white/5">
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-xs font-black text-white uppercase">{r.patient.name}</span>
+                                    <span className="text-yellow-500 text-xs">{'★'.repeat(Math.round(r.rating))}</span>
+                                </div>
+                                <p className="text-xs text-slate-500 font-medium leading-relaxed italic">&quot;{r.comment}&quot;</p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
       </div>
-
-      <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-lg">
-        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <span className="text-yellow-400">💭</span> Patient Reviews
-        </h2>
-
-        {doctor.reviews.length === 0 ? (
-          <div className="text-center py-8 bg-white/5 rounded-2xl border border-white/5">
-            <p className="text-gray-400">No reviews yet for this specialist.</p>
-          </div>
-        ) : (
-          <ul className="space-y-4">
-            {doctor.reviews.map((r, i) => (
-              <li key={i} className="bg-white/5 rounded-2xl p-5 border border-white/5 hover:border-white/10 transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-white">{r.patient.name}</span>
-                  <span className="text-yellow-400 text-sm tracking-widest">{'★'.repeat(Math.round(r.rating))}{'☆'.repeat(5 - Math.round(r.rating))}</span>
-                </div>
-                {r.comment && <p className="text-gray-400 text-sm leading-relaxed">{r.comment}</p>}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      
+      <style jsx global>{`
+        .rdp-custom {
+            --rdp-cell-size: 40px;
+            --rdp-accent-color: #2563eb;
+            --rdp-background-color: #3b82f633;
+            margin: 0;
+            color: #94a3b8;
+        }
+        .rdp-custom .rdp-day_selected {
+            background-color: var(--rdp-accent-color) !important;
+            color: white !important;
+            font-weight: 800;
+            border-radius: 12px;
+        }
+        .rdp-custom .rdp-day:hover:not(.rdp-day_selected) {
+            background-color: #ffffff0a;
+            border-radius: 12px;
+        }
+        .rdp-custom .rdp-head_cell {
+            font-size: 10px;
+            font-weight: 900;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .rdp-custom .rdp-nav_button {
+            color: white;
+            background: #ffffff0a;
+            border-radius: 8px;
+        }
+      `}</style>
     </motion.div>
   );
 }

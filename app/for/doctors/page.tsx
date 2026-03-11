@@ -14,7 +14,7 @@ export default function DoctorsPlatformPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-mesh text-gray-100 font-sans">
+        <div className="min-h-screen  text-gray-100 font-sans">
             <nav className="backdrop-blur-xl bg-black/20 border-b border-white/5 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
